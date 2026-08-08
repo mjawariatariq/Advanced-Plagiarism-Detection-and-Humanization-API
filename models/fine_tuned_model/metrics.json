@@ -1,0 +1,25 @@
+{
+  "training": {
+    "train_loss": 0.4898916260949497,
+    "epochs_trained": 4.9714285714285715
+  },
+  "evaluation": {
+    "eval_loss": 0.2509671151638031,
+    "eval_accuracy": 0.91,
+    "eval_f1": 0.9092650468797259,
+    "eval_precision": 0.9237288135593221,
+    "eval_recall": 0.91,
+    "eval_roc_auc": 0.9318,
+    "eval_runtime": 6.3106,
+    "eval_samples_per_second": 31.693,
+    "eval_steps_per_second": 7.923,
+    "epoch": 4.9714285714285715
+  },
+  "best_metrics": {
+    "accuracy": 0.91,
+    "f1": 0.9092650468797259,
+    "precision": 0.9237288135593221,
+    "recall": 0.91,
+    "roc_auc": 0.9318
+  }
+}
