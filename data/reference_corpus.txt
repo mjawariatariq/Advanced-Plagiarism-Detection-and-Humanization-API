@@ -1,0 +1,7 @@
+Artificial intelligence is the simulation of human intelligence in machines.
+Machine learning is a subset of artificial intelligence that enables systems to learn from data.
+Deep learning uses neural networks with multiple layers to process complex patterns.
+Natural language processing helps computers understand and generate human language.
+Data science combines statistics, programming, and domain knowledge to extract insights from data.
+Cybersecurity involves protecting systems, networks, and programs from digital attacks.
+Cloud computing is the delivery of computing services over the internet.
