@@ -152,11 +152,10 @@ Rewritten text:"""
 
             humanized_text = self._clean_text(response.text)
 
-            # If cleaning removed everything, try to extract the actual content
-            if not humanized_text or len(humanized_text) < 5:
-                # Try to find the actual rewritten content
+            # If cleaning removed everything or text is too short, try harder to extract
+            if not humanized_text or len(humanized_text) < 10:
                 raw_text = response.text
-                # Look for content after common headers
+                # Try to find content after common headers
                 headers = [
                     "rewritten text:",
                     "rewritten version:",
@@ -172,10 +171,23 @@ Rewritten text:"""
                         parts = raw_text.lower().split(header.lower(), 1)
                         if len(parts) > 1:
                             humanized_text = parts[1].strip()
+                            # Remove any remaining markdown
+                            humanized_text = re.sub(r'\*\*', '', humanized_text)
+                            humanized_text = re.sub(r'#+\s*', '', humanized_text)
                             break
                 
+                # If still empty, try to get everything after the first sentence
+                if not humanized_text or len(humanized_text) < 10:
+                    sentences = raw_text.split('. ')
+                    if len(sentences) > 1:
+                        # Skip the first sentence if it looks like a header
+                        first_sentence = sentences[0].lower()
+                        header_words = ["here", "ways", "rewrite", "depending", "desired", "level", "formality"]
+                        if any(word in first_sentence for word in header_words):
+                            humanized_text = '. '.join(sentences[1:]).strip()
+                
                 # If still empty, use the original text
-                if not humanized_text or len(humanized_text) < 5:
+                if not humanized_text or len(humanized_text) < 10:
                     humanized_text = text
                     print("⚠️ Could not extract rewritten text, using original")
 
@@ -231,6 +243,9 @@ Rewritten text:"""
 
     def _clean_text(self, text: str) -> str:
         """Clean Gemini response - remove ALL headers and explanations."""
+        if not text:
+            return ""
+        
         text = text.strip()
         
         # Split by newlines and keep only content that looks like actual text
@@ -260,7 +275,8 @@ Rewritten text:"""
                 "desired level",
                 "academic formality",
                 "tone you want",
-                "style you prefer"
+                "style you prefer",
+                "ways to rewrite"
             ]
             
             should_skip = False
@@ -272,8 +288,30 @@ Rewritten text:"""
             if not should_skip:
                 result_lines.append(line)
         
-        # If we removed everything, return the original
+        # If we removed everything, try a different approach
         if not result_lines:
+            # Try to find the actual rewritten content
+            raw_text = text
+            # Look for content after common headers
+            headers = [
+                "rewritten text:",
+                "rewritten version:",
+                "humanized text:",
+                "humanized version:",
+                "here is",
+                "here are"
+            ]
+            for header in headers:
+                if header.lower() in raw_text.lower():
+                    parts = raw_text.lower().split(header.lower(), 1)
+                    if len(parts) > 1:
+                        result = parts[1].strip()
+                        # Remove markdown
+                        result = re.sub(r'\*\*', '', result)
+                        result = re.sub(r'#+\s*', '', result)
+                        return result
+            
+            # If still nothing, return the original
             return text
         
         result = ' '.join(result_lines)
